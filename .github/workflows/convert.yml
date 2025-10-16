@@ -1,18 +1,13 @@
-name: Deploy Jupyter Notebook to GitHub Pages
+name: Deploy Notebook to GitHub Pages
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
-  contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -24,24 +19,26 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.x'
+        python-version: '3.10'
     
-    - name: Install dependencies
+    - name: Install and convert
       run: |
-        python -m pip install --upgrade pip
-        pip install jupyter nbconvert
+        pip install nbconvert
+        jupyter nbconvert --to html main.ipynb
         
-    - name: Convert notebook to HTML
+    - name: Create index.html
       run: |
-        jupyter nbconvert --to html main.ipynb --output-dir ./_site
+        # Переименовываем main.html в index.html для GitHub Pages
+        mv main.html index.html
         
     - name: Setup Pages
       uses: actions/configure-pages@v3
       
-    - name: Upload to Pages
+    - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:
-        path: ./_site
+        path: .
+        name: github-pages
 
   deploy:
     environment:
