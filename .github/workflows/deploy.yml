@@ -15,12 +15,16 @@ jobs:
     - name: Convert to HTML
       run: |
         pip install nbconvert
-        jupyter nbconvert --to html main.ipynb
+        jupyter nbconvert --to html main.ipynb --output-dir ./
+        
+    - name: Rename to index.html
+      run: |
+        mv main.html index.html
         
     - name: Commit HTML
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add main.html
+        git add index.html
         git commit -m "Auto-update HTML version of notebook" || exit 0
         git push
